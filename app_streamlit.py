@@ -1,6 +1,6 @@
 import streamlit as st
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification
 
 st.set_page_config(page_title="Fake News Detector", layout="centered")
 
@@ -11,8 +11,8 @@ MODEL_NAME = "prajjwal1/bert-tiny"
 
 @st.cache_resource
 def load_model():
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
+    tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
+    model = BertForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
     model.eval()
     return tokenizer, model
 
