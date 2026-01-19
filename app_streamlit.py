@@ -31,7 +31,8 @@ if st.button("Check News"):
 
         pred = torch.argmax(outputs.logits, dim=1).item()
 
-        if pred == 1:
+        if pred == 0:
             st.success("✅ This looks like REAL News")
         else:
             st.error("❌ This looks like FAKE News")
+
