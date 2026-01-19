@@ -1,6 +1,4 @@
-torch
-transformers
-pandas
-scikit-learn
 fastapi
 uvicorn
+torch --index-url https://download.pytorch.org/whl/cpu
+transformers
