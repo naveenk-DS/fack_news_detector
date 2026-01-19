@@ -7,7 +7,7 @@ st.set_page_config(page_title="Fake News Detector", layout="centered")
 st.title("📰 Fake News Detection System")
 st.write("Paste a news article below and click **Check News**")
 
-MODEL_NAME = "jy46604790/Fake-News-BERT-Classifier"
+MODEL_NAME = "mrm8488/bert-tiny-finetuned-fake-news-detection"
 
 @st.cache_resource
 def load_model():
@@ -31,7 +31,6 @@ if st.button("Check News"):
 
         pred = torch.argmax(outputs.logits, dim=1).item()
 
-        # Get label from model config (correct way)
         label = model.config.id2label[pred]
 
         if label.lower() == "real":
