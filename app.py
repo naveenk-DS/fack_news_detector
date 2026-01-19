@@ -4,11 +4,11 @@ from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassific
 
 app = FastAPI()
 
-# Load trained model from local folder
-MODEL_PATH = "./fake_news_model"
+# Load base pretrained model (no local files needed)
+MODEL_NAME = "distilbert-base-uncased-finetuned-sst-2-english"
 
-tokenizer = DistilBertTokenizerFast.from_pretrained(MODEL_PATH)
-model = DistilBertForSequenceClassification.from_pretrained(MODEL_PATH)
+tokenizer = DistilBertTokenizerFast.from_pretrained(MODEL_NAME)
+model = DistilBertForSequenceClassification.from_pretrained(MODEL_NAME)
 model.eval()
 
 @app.get("/")
