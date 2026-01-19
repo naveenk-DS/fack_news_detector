@@ -1,41 +1,92 @@
 import streamlit as st
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification
 
-st.set_page_config(page_title="Fake News Detector", layout="centered")
+# ------------------ PAGE CONFIG ------------------
+st.set_page_config(
+    page_title="Fake News Detection System",
+    layout="centered",
+    page_icon="📰"
+)
 
+# ------------------ TITLE ------------------
 st.title("📰 Fake News Detection System")
-st.write("Paste a news article below and click **Check News**")
+st.write("Paste a news article below and click **Check News** to detect whether it is Fake or Real.")
 
-MODEL_NAME = "hamzab/roberta-fake-news-classification"
+# ------------------ MODEL SETUP ------------------
+MODEL_NAME = "mrm8488/bert-tiny-finetuned-fake-news-detection"
 
-@st.cache_resource
+@st.cache_resource(show_spinner=True)
 def load_model():
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+    tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
+    model = BertForSequenceClassification.from_pretrained(MODEL_NAME)
     model.eval()
     return tokenizer, model
 
-tokenizer, model = load_model()
+with st.spinner("Loading AI model, please wait..."):
+    tokenizer, model = load_model()
 
-text = st.text_area("Enter News Text Here", height=200)
+# ------------------ INPUT AREA ------------------
+text = st.text_area(
+    "📝 Enter News Text Here",
+    height=220,
+    placeholder="Paste any news article here..."
+)
 
-if st.button("Check News"):
+# ------------------ PREDICTION BUTTON ------------------
+if st.button("🔍 Check News"):
+
     if text.strip() == "":
-        st.warning("Please enter some text.")
+        st.warning("⚠️ Please enter some news text before checking.")
     else:
-        inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+        inputs = tokenizer(
+            text,
+            return_tensors="pt",
+            truncation=True,
+            padding=True,
+            max_length=512
+        )
 
         with torch.no_grad():
             outputs = model(**inputs)
 
-        pred = torch.argmax(outputs.logits, dim=1).item()
+        # Prediction
+        logits = outputs.logits
+        probs = torch.softmax(logits, dim=1)[0]
+        pred = torch.argmax(probs).item()
+
+        # Correct label mapping from model
         label = model.config.id2label[pred]
 
+        confidence = float(probs[pred]) * 100
+
+        st.markdown("---")
+        st.subheader("🧠 Prediction Result")
+
+        # Display result
         if "real" in label.lower():
-            st.success("✅ This looks like REAL News")
+            st.success(f"✅ This looks like REAL News")
         else:
-            st.error("❌ This looks like FAKE News")
+            st.error(f"❌ This looks like FAKE News")
+
+        # Confidence score
+        st.info(f"📊 Confidence: **{confidence:.2f}%**")
+
+# ------------------ SIDEBAR INFO ------------------
+st.sidebar.title("ℹ️ About Project")
+st.sidebar.write("""
+This is a Fake News Detection system built using:
+
+- 🧠 Transformer Model (BERT Tiny)  
+- 🤗 HuggingFace  
+- 🌐 Streamlit Web App  
+- ☁️ Deployed on Render Cloud  
+
+The system analyzes news text and predicts whether it is **Fake** or **Real**.
+""")
+
+st.sidebar.markdown("---")
+st.sidebar.write("👨‍🎓 Project by Naveen")
 
 
 
