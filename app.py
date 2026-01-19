@@ -1,14 +1,14 @@
 from fastapi import FastAPI
 import torch
-from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 app = FastAPI()
 
-# Load base pretrained model (no local files needed)
-MODEL_NAME = "distilbert-base-uncased-finetuned-sst-2-english"
+# VERY SMALL MODEL (fits Render free memory)
+MODEL_NAME = "prajjwal1/bert-tiny"
 
-tokenizer = DistilBertTokenizerFast.from_pretrained(MODEL_NAME)
-model = DistilBertForSequenceClassification.from_pretrained(MODEL_NAME)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
 model.eval()
 
 @app.get("/")
@@ -25,3 +25,4 @@ def predict(text: str):
     pred = torch.argmax(outputs.logits, dim=1).item()
 
     return {"prediction": "REAL" if pred == 1 else "FAKE"}
+
