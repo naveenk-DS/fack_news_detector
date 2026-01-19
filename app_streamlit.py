@@ -31,8 +31,12 @@ if st.button("Check News"):
 
         pred = torch.argmax(outputs.logits, dim=1).item()
 
-        if pred == 0:
+        # Get label from model config (correct way)
+        label = model.config.id2label[pred]
+
+        if label.lower() == "real":
             st.success("✅ This looks like REAL News")
         else:
             st.error("❌ This looks like FAKE News")
+
 
