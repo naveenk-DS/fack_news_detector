@@ -14,7 +14,7 @@ st.title("📰 Fake News Detection System")
 st.write("Paste a news article below and click **Check News** to detect whether it is Fake or Real.")
 
 # ------------------ MODEL SETUP ------------------
-MODEL_NAME = "mrm8488/bert-tiny-finetuned-fake-news-detection"
+MODEL_NAME = "distilbert-base-uncased-finetuned-sst-2-english"
 
 @st.cache_resource(show_spinner=True)
 def load_model():
