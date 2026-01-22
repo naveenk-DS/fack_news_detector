@@ -64,11 +64,11 @@ if st.button("🔍 Check News"):
         st.subheader("🧠 Prediction Result")
 
         # Display result
-        if label.upper() == "REAL":
-
-            st.success(f"✅ This looks like REAL News")
+        if label == "LABEL_1":
+            st.success("✅ This looks like REAL News")
         else:
-            st.error(f"❌ This looks like FAKE News")
+            st.error("❌ This looks like FAKE News")
+
 
         # Confidence score
         st.info(f"📊 Confidence: **{confidence:.2f}%**")
