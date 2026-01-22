@@ -13,7 +13,7 @@ st.title("📰 Fake News Detection System")
 st.write("Paste a news article below and click **Check News** to detect whether it is Fake or Real.")
 
 # ---------------- LOAD MODEL ----------------
-MODEL_NAME = "jy46604790/Fake-News-BERT-Classifier"
+MODEL_NAME = "hamzab/roberta-fake-news-classification"
 
 @st.cache_resource
 def load_model():
@@ -45,7 +45,7 @@ if st.button("🔍 Check News"):
         st.subheader("🧠 Prediction Result")
 
         # 🔥 FINAL CORRECT MAPPING
-        if label == "LABEL_1":
+        if "REAL" in label.upper():
             st.success("✅ This looks like REAL News")
         else:
             st.error("❌ This looks like FAKE News")
