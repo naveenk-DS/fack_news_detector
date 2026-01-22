@@ -36,32 +36,39 @@ text = st.text_area(
     max_chars=2000  # Limit for better performance
 )
 
-if st.button("🔍 Check News", type="primary"):
-    if not classifier:
-        st.error("❌ Model failed to load. Please refresh.")
-    elif not text.strip():
+# ---------------- PREDICT ----------------
+if st.button("🔍 Check News"):
+    if not text.strip():
         st.warning("⚠️ Please enter some news text.")
+    elif not classifier:
+        st.error("❌ Model failed to load.")
     else:
-        # Truncate long text
-        if len(text) > 512:
-            text = text[:500] + "..."
-            st.warning("📝 Text truncated for analysis (max 512 tokens)")
+        # ADD TITLE AND SPECIAL FORMAT (REQUIRED by this model)
+        title = st.text_input("📰 News Title (optional):", placeholder="Enter title here...")
         
-        result = classifier(text)[0]
-        label = result["label"]
+        # Format input as model expects: <title>TITLE<content>TEXT<end>
+        if title.strip():
+            formatted_text = f"<title>{title.strip()}<content>{text.strip()}<end>"
+        else:
+            # Use first sentence as title if none provided
+            sentences = text.strip().split('.')
+            auto_title = sentences[0].strip() + '.' if sentences else "News Article"
+            formatted_text = f"<title>{auto_title}<content>{text[len(auto_title)+1:].strip()}<end>"
+        
+        st.info("📝 Using formatted input: title + content")  # Debug info
+        
+        result = classifier(formatted_text)[0]
+        label = result["label"]  # Will be "Fake" or "Real" (lowercase first letter)
         confidence = result["score"] * 100
 
         st.markdown("---")
         st.subheader("🧠 Prediction Result")
 
-        # Improved label mapping (check exact model labels)
-        if "REAL" in label.upper() or "LEGIT" in label.upper():
-            st.success("✅ This looks like **REAL** News")
+        # Model outputs: "Fake" or "Real" exactly
+        if label == "Real":
+            st.success("✅ **REAL News**")
         else:
-            st.error("❌ This looks like **FAKE** News")
+            st.error("❌ **FAKE News**")
 
-        col1, col2 = st.columns([3,1])
-        with col1:
-            st.info(f"**Confidence**: {confidence:.1f}%")
-        with col2:
-            st.metric("Score", f"{confidence:.0f}%")
+        st.info(f"📊 **Confidence**: {confidence:.1f}%")
+        st.caption(f"Model label: `{label}` | Formatted input length: {len(formatted_text)} chars")
